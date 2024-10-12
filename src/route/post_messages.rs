@@ -5,21 +5,23 @@ use crate::message::message_buffer::MessageBuffer;
 use crate::route::method::Method;
 use crate::route::route::Route;
 
-pub struct PostMessage {
+const MAX_MESSAGE_SIZE: usize = 160*2 + 1; // 160 characters, 2 bytes per character to account for UTF-8
+
+pub struct PostMessages {
     messages: &'static Mutex<MessageBuffer>
 }
 
-impl PostMessage {
+impl PostMessages {
     pub fn new(messages: &'static Mutex<MessageBuffer>) -> Self {
-        PostMessage {
+        PostMessages {
             messages
         }
     }
 }
 
-impl<'a> Route<'a> for PostMessage {
+impl<'a> Route<'a> for PostMessages {
     fn route(&self) -> &'a str {
-        "/message"
+        "/messages"
     }
 
     fn method(&self) -> &Method {
@@ -45,9 +47,25 @@ impl<'a> Route<'a> for PostMessage {
         let ip = request.ip().unwrap_or("Unknown IP".to_string());
         match request.data {
             Some(ref data) => {
+                if data.len() > MAX_MESSAGE_SIZE {
+                    return Response {
+                        request,
+                        status: HttpResult::InvalidRequest,
+                        content_type: HttpContentType::Html,
+                        data: String::from("Message too long")
+                    };
+                }
+
                 messages.add_message(ip, data.clone());
             }
-            None => {}
+            None => {
+                return Response {
+                    request,
+                    status: HttpResult::InvalidRequest,
+                    content_type: HttpContentType::Html,
+                    data: String::from("No message given")
+                };
+            }
         }
 
         Response {

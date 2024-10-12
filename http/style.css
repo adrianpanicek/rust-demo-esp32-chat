@@ -1,0 +1,93 @@
+body {
+    font-family: Arial, sans-serif;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    margin: 0;
+    padding: 0;
+}
+.chat-container {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    padding: 1em;
+}
+#messages {
+    flex-grow: 1;
+    border: 1px solid #ccc;
+    padding: 1em;
+    overflow-y: auto;
+    margin-bottom: 10px;
+    resize: none;
+}
+.input-container {
+    display: flex;
+}
+.input-container form {
+    display: contents;
+}
+.input-container input {
+    flex-grow: 1;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px 0 0 4px;
+}
+.input-container input:focus, #messages:focus {
+    outline: none;
+}
+.input-container button {
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-left: none;
+    background-color: #007BFF;
+    color: white;
+    border-radius: 0 4px 4px 0;
+    cursor: pointer;
+}
+.input-container button:hover {
+    background-color: #0056b3;
+}
+#header {
+    padding: 0 1em;
+    display: flex;
+    justify-content: space-between;
+}
+#title {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+}
+h1 {
+    margin: 0;
+    padding: 0.2em 0;
+}
+#github-logo {
+    overflow: visible;
+    resize: both;
+    height: 2em;
+    padding: 0.2em;
+}
+#github-link {
+    display: flex;
+    align-content: center;
+}
+#github-link>* {
+    align-self: center;
+}
+#github-link a {
+    margin: 0;
+    font-size: 2em;
+    color: black;
+    font-weight: bold;
+    text-decoration: none;
+}
+@media (max-width: 600px) {
+    #header {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+    }
+    #github-link a {
+        font-size: 1.5em;
+    }
+}

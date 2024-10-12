@@ -5,34 +5,33 @@ use crate::message::message_buffer::MessageBuffer;
 use crate::route::method::Method;
 use crate::route::route::Route;
 
-pub struct PostMessage {
+pub struct GetMessages {
     messages: &'static Mutex<MessageBuffer>
 }
 
-impl PostMessage {
+impl GetMessages {
     pub fn new(messages: &'static Mutex<MessageBuffer>) -> Self {
-        PostMessage {
+        GetMessages {
             messages
         }
     }
 }
 
-impl<'a> Route<'a> for PostMessage {
+impl<'a> Route<'a> for GetMessages {
     fn route(&self) -> &'a str {
-        "/message"
+        "/messages"
     }
 
     fn method(&self) -> &Method {
-        &Method::POST
+        &Method::GET
     }
 
-    fn handle<'c, 'd>(&self, mut request: Request<'c, 'd>) -> Response<'c, 'd> {
-        // Thanks to shadowing, we can name the buffer the same as the buffer in the outer scope
-        let messages = &self.messages;
-        let mut messages = match (*messages).lock() {
+    fn handle<'c, 'd>(&self, request: Request<'c, 'd>) -> Response<'c, 'd> {
+        let messages = match (*&self.messages).lock() {
             Ok(mb) => mb,
             Err(err) => {
                 error!("Could not lock message buffer: {:?}", err);
+
                 return Response {
                     request,
                     status: HttpResult::InternalServerError,
@@ -41,14 +40,6 @@ impl<'a> Route<'a> for PostMessage {
                 };
             }
         };
-
-        let ip = request.ip().unwrap_or("Unknown IP".to_string());
-        match request.data {
-            Some(ref data) => {
-                messages.add_message(ip, data.clone());
-            }
-            None => {}
-        }
 
         Response {
             request,
